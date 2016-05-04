@@ -65,9 +65,24 @@ class SimplePDO
 
         $sth = $this->dbh->prepare($sql);
 
-        foreach ($multiData as $data) {
-            $fields_values = array_values($data);
-            $sth->execute($fields_values);
+        $execute_return = true;
+
+        try {
+            $this->beginTransaction();
+
+            foreach ($multiData as $data) {
+                $fields_values = array_values($data);
+                // when fail return false
+                $sth_execute = $sth->execute($fields_values);
+                if ($sth_execute == false) {
+                    throw new Exception('batchInsert fail');
+                }
+            }
+
+            $this->commit();
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            $this->rollBack();
         }
 
         return $this;
