@@ -39,17 +39,67 @@ class SimplePDO
         $fields_values = array_values($data);
 
         $fields_str = implode(",", $fields);
-        $fields_values_str = implode(',', array_fill(0, count($fields), '?'));
+        $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
 
-        $sql = "INSERT INTO $table (" . $fields_str . ") VALUES (" . $fields_values_str . ")";
+        $sql = "INSERT INTO $table (" . $fields_str . ") VALUES (" . $fields_place_holder . ")";
 
         $sth = $this->dbh->prepare($sql);        
         return $sth->execute($fields_values);
     }
 
+    public function batchInsert($table, $multiData)
+    {
+        if (!empty($multiData[0]) && is_array($multiData[0])) {
+
+            $fields = array_keys($multiData[0]);
+            $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
+
+            $fields_str = implode(",", $fields);
+            $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
+
+        } else {
+            throw new Exception('PDO multiInsert multiData[0] ERROR');
+        }
+
+        $sql = "INSERT INTO $table (" . $fields_str . ") VALUES (" . $fields_place_holder . ")";
+
+        $sth = $this->dbh->prepare($sql);
+
+        foreach ($multiData as $data) {
+            $fields_values = array_values($data);
+            $sth->execute($fields_values);
+        }
+
+        return $this;
+    }
+
     public function lastInsertId()
     {
         return $this->pdo->lastInsertId();
+    }
+
+    /**
+     * beginTransaction 事务开始
+     */
+    public function beginTransaction()
+    {
+        $this->dbh->beginTransaction();
+    }
+
+    /**
+     * commit 事务提交
+     */
+    public function commit()
+    {
+        $this->dbh->commit();
+    }
+
+    /**
+     * rollback 事务回滚
+     */
+    public function rollback()
+    {
+        $this->dbh->rollback();
     }
 
 }
