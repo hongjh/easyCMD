@@ -52,8 +52,6 @@ class SimplePDO
         if (!empty($multiData[0]) && is_array($multiData[0])) {
 
             $fields = array_keys($multiData[0]);
-            $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
-
             $fields_str = implode(",", $fields);
             $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
 
@@ -117,4 +115,20 @@ class SimplePDO
         $this->dbh->rollback();
     }
 
+
+    /**
+     * rollback 事务回滚
+     */
+    public function fetch($table, $fields = '*')
+    {
+        // 非数组转换
+        if (is_array($fields)) {
+            $fields = implode(',', $fields);
+        }
+
+        $sth = $this->dbh->prepare("SELECT $fields FROM $table");
+        $sth->execute();
+        $result = $sth->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
 }
