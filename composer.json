@@ -1,0 +1,14 @@
+{
+    "name": "hongjh/easycron",
+    "description": "a simple php crontab",
+    "authors": [
+        {
+            "name": "hongjh",
+            "email": "565983236@qq.com"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5.9"
+    }
+}
