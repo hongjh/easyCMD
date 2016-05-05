@@ -117,7 +117,7 @@ class SimplePDO
 
 
     /**
-     * rollback 事务回滚
+     * fetch
      */
     public function fetch($table, $fields = '*')
     {
@@ -129,6 +129,23 @@ class SimplePDO
         $sth = $this->dbh->prepare("SELECT $fields FROM $table");
         $sth->execute();
         $result = $sth->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    /**
+     * fetchAll
+     */
+    public function fetchAll($table, $fields = '*')
+    {
+        // 非数组转换
+        if (is_array($fields)) {
+            $fields = implode(',', $fields);
+        }
+
+        $sth = $this->dbh->prepare("SELECT $fields FROM $table");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 }
