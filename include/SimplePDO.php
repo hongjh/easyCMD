@@ -36,43 +36,37 @@ class SimplePDO
     {
 
         $fields = array_keys($data);
-        $fields_values = array_values($data);
+        $fieldsValues = array_values($data);
 
-        $fields_str = implode(",", $fields);
-        $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
+        $fieldsStr = implode(",", $fields);
+        $fieldsPlaceholder = implode(',', array_fill(0, count($fields), '?'));
 
-        $sql = "INSERT INTO $table (" . $fields_str . ") VALUES (" . $fields_place_holder . ")";
+        $sql = "INSERT INTO $table (" . $fieldsStr . ") VALUES (" . $fieldsPlaceholder . ")";
 
-        $sth = $this->dbh->prepare($sql);        
-        return $sth->execute($fields_values);
+        $sth = $this->dbh->prepare($sql);
+        return $sth->execute($fieldsValues);
     }
 
-    public function batchInsert($table, $multiData)
+    /**
+     * 批量插入
+     * @param array $fields 属性名
+     * @param array $multiValues 值
+     */
+    public function batchInsert($table, $fields, $multiValues)
     {
-        if (!empty($multiData[0]) && is_array($multiData[0])) {
+        $fieldsStr = implode(",", $fields);
+        $fieldsPlaceholder = implode(',', array_fill(0, count($fields), '?'));
 
-            $fields = array_keys($multiData[0]);
-            $fields_str = implode(",", $fields);
-            $fields_place_holder = implode(',', array_fill(0, count($fields), '?'));
-
-        } else {
-            throw new Exception('PDO multiInsert multiData[0] ERROR');
-        }
-
-        $sql = "INSERT INTO $table (" . $fields_str . ") VALUES (" . $fields_place_holder . ")";
+        $sql = "INSERT INTO $table (" . $fieldsStr . ") VALUES (" . $fieldsPlaceholder . ")";
 
         $sth = $this->dbh->prepare($sql);
 
-        $execute_return = true;
-
         try {
             $this->beginTransaction();
-
-            foreach ($multiData as $data) {
-                $fields_values = array_values($data);
-                // when fail return false
-                $sth_execute = $sth->execute($fields_values);
-                if ($sth_execute == false) {
+            foreach ($multiValues as $values) {
+                // 失败时，返回false
+                $sthExecute = $sth->execute($values);
+                if ($sthExecute == false) {
                     throw new Exception('batchInsert fail');
                 }
             }
@@ -115,7 +109,6 @@ class SimplePDO
         $this->dbh->rollback();
     }
 
-
     /**
      * fetch
      */
@@ -132,7 +125,6 @@ class SimplePDO
         return $result;
     }
 
-
     /**
      * fetchAll
      */
@@ -148,4 +140,5 @@ class SimplePDO
         $result = $sth->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+
 }
