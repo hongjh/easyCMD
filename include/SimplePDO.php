@@ -141,4 +141,10 @@ class SimplePDO
         return $result;
     }
 
+    public function __destruct()
+    {
+        // 释放连接
+        unset($this->dbh);
+    }
+
 }
