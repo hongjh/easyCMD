@@ -15,7 +15,7 @@ class A
 
 }
 
-include "include/Di.php";
+include "../include/Di.php";
 $di = new Di();
 //匿名函数方式注册一个名为a1的服务
 $di->setShared('a1', function($name = "") {
